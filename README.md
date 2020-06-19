@@ -26,6 +26,11 @@ The solution for the problem stated, is the "Menu Search App". This software sho
 8. When the same menu has been selected it should tell the user that the menu has been used recently
 9. The app has a secure login system
 
+# Design 
+
+### Skecth of the app
+![Appsketch1](Appendix/appsketch1.jpg)
+
 
 
 
