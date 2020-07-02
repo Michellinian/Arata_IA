@@ -28,7 +28,7 @@ The solution for the problem stated, is the "Menu Search App". This software sho
 
 ### Justification of tool
 
-Pycharm will be used throughout the entire process 
+Pycharm will be used throughout the entire process of the development. IDE makes the development of the app easier and more efficient than the online platform. The reason for this is because IDE allows us to create multiple files unlike the online platforms. This helps the developers keep track of the program development, especially when creating less simple programs. The programming language that will be used mainly throughout the development is python. Python offers a more simple syntax comparing to other languages, and it is developer friendly. In addition to this, because of its less strict syntax, the process of debugging may not be as difficult as others. For these reasons, these tools will be used to develop this app. 
 
 # Design 
 
