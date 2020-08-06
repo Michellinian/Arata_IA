@@ -61,14 +61,68 @@ The method of this "search" procedure should be something like this:
 
 ### Creating a csv file 
 
-Creating new informations about the menus are very time consuming, since in this case, we need to have many range of menus, so that the user has something to choose upon. Therfore instead of creating a new database by myself, I decided to get data from different websites. In this way it is more time efficient, and I will able to load many different menus very quickly. For this, I used a method called Webscraping. Webscraping is basically the skill of skimming through different websites and getting the only informations you desire. To do this we use the html of the website, and indicate which tags we want to extract from the website. This is the basic for accessing a website in python:
+ Creating new informations about the menus are very time consuming, since in this case, we need to have many range of menus, so that the user has something to choose upon. Therfore instead of creating a new database by myself, I decided to get data from different websites. In this way it is more time efficient, and I will able to load many different menus very quickly. For this, I used a method called Webscraping. Webscraping is basically the skill of skimming through different websites and getting the only informations you desire. To do this we use the html of the website, and indicate which tags we want to extract from the website. This is the basic for accessing a website in python:
 ```
 import requests
 
 allRecipes = requests.get("https://www.allrecipes.com/recipes/1947/everyday-cooking/quick-and-easy/?page=" + str(page))
 ```
-This code is essentially requesting access to the website. If we print this result it would give codes such as `Request[403]` or `Request[200]`. 403 is an HTML status code, which basically means "forbidden". If it returns 403, this means that the website has denied access, because of some reason. On the other hand, 200 is another HTML status code, which means "Request successful". The code aboce sucessfully returns 200, which means that access permission was granted. If this is okay, then the next step is extracting the desired information using html tags. 
+ This code is essentially requesting access to the website. If we print this result it would give codes such as `Request[403]` or `Request[200]`. 403 is an HTML status code, which basically means "forbidden". If it returns 403, this means that the website has denied access, because of some reason. On the other hand, 200 is another HTML status code, which means "Request successful". The code aboce sucessfully returns 200, which means that access permission was granted. If this is okay, then the next step is extracting the desired information using html tags. By importing a package called the BeautifulSoup into the python file, I was able to retrieve the html code of the website with the following code:
+```
+allRecipes_soup = BeautifulSoup(allRecipes.content, "html.parser")
+containers1 = allRecipes_soup.findAll("article", {"class": "fixed-recipe-card"})
+```
+ With the first line it gets entire html code of the website, and by using the "findAll" command that is inside the BeautifulSoup package, it goes throug entire html code and tries to find the desginated tag. Here I wanted to retrieve all the menu names on the website. To get the html tag of the menu names, I inspected the website by pressing "inspect", which appears when right clicking on the homepage. From there I tracked down the html tag of the menu names, and since all of the menu names had the same tag and class name: `"fixed-recipe-card"`, I simply executed the findAll command to retrieve all of the menu names on the webpage. Then I did the same thing for the descriptions of the menus. Description of the menu would be necessary for the users, since the name of the menu is not sufficient enough to show what kind of menu the user is about to make. 
+ 
+ Another thing I had to add were the ingredients for all the menus. Although, since all the ingredients were written inside another link, which is the link for the individual menus, I decided to retrieve all of the hrefs of the desginated tag. I will be explaining this more later on the repo. 
+ 
+Because the findAll command can hekp us find all of the referring tags, the code itself was very simple. Although because in this app, I wanted to have many menus available for the users, I chose not only to inspect the first page of the website but for multiple pages. Each page in the www.allrecipes.com contained twenty different menus, thus I ran a for loop for multiple pages, to retrieve as many manu informations as possible. The following is the code:
 
+```
+# retrieve data from www.allrecipes.com (source 1)
+pageNum = 2
+# # list for all the names, descriptions and links
+name_list = []
+desc_list = []
+link_list = []
+for page in range(pageNum, n):
+    # retrieving html code
+    allRecipes = requests.get("https://www.allrecipes.com/recipes/1947/everyday-cooking/quick-and-easy/?page=" + str(page))
+    allRecipes_soup = BeautifulSoup(allRecipes.content, "html.parser")
+    # assigning which html tag to look for
+    containers1 = allRecipes_soup.findAll("article", {"class": "fixed-recipe-card"})
+    # for all the containers in the same page repeat the process
+    for container in containers1:
+        # retrieve the menu names
+        name_container = container.find("span", {"class":"fixed-recipe-card__title-link"})
+        menu_name = name_container.text
+        name_list.append(menu_name)
+        # retrieve descriptions
+        desc_container = container.find("div", {"class":"fixed-recipe-card__description"})
+        menu_desc = desc_container.text
+        desc_list.append(desc_list)
+        # retrieve links for the recipe
+        link_container = container.find("a", {"class":"fixed-recipe-card__title-link"})
+        recipe_link = link_container["href"]
+        # adding links into the list
+        link_list.append(recipe_link)
+```
+The range of the for loop `(pageNum, n)`, where n can be any number bigger than 2. If I print the results on the console it would be something like this: 
+```
+name: A Good Easy Garlic Chicken 
+ description: Sprinkle chicken breasts with garlic powder, onion powder and seasoning salt - then sautee and enjoy. Couldn't be easier! Great recipe for quick and easy meal, even for the pickiest eater! 
+ link: https://www.allrecipes.com/recipe/23998/a-good-easy-garlic-chicken/
+name: Balsamic-Glazed Salmon Fillets 
+ description: A glaze featuring balsamic vinegar, garlic, honey, white wine and Dijon mustard makes baked salmon fillets extraordinary. 
+ link: https://www.allrecipes.com/recipe/82817/balsamic-glazed-salmon-fillets/
+name: Quick Chicken Piccata 
+ description: Chef John's quick and easy pan-fried chicken breasts are topped with a simple pan sauce made with capers, butter, white wine, and lemon juice. 
+ link: https://www.allrecipes.com/recipe/220751/quick-chicken-piccata/
+name: Baked Salmon Fillets Dijon 
+ description: Delicious baked salmon coated with Dijon-style mustard and seasoned bread crumbs, and topped with butter. 
+ link: https://www.allrecipes.com/recipe/22538/baked-salmon-fillets-dijon/
+```
+This is just part of the output. Although essentially this would continue until the for loop has looped over every page.
 
 
 
