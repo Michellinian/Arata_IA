@@ -62,13 +62,13 @@ The method of this "search" procedure should be something like this:
 ### Creating a csv file 
 
  Creating new informations about the menus are very time consuming, since in this case, we need to have many range of menus, so that the user has something to choose upon. Therfore instead of creating a new database by myself, I decided to get data from different websites. In this way it is more time efficient, and I will able to load many different menus very quickly. For this, I used a method called Webscraping. Webscraping is basically the skill of skimming through different websites and getting the only informations you desire. To do this we use the html of the website, and indicate which tags we want to extract from the website. This is the basic for accessing a website in python:
-```
+```py
 import requests
 
 allRecipes = requests.get("https://www.allrecipes.com/recipes/1947/everyday-cooking/quick-and-easy/?page=" + str(page))
 ```
  This code is essentially requesting access to the website. If we print this result it would give codes such as `Request[403]` or `Request[200]`. 403 is an HTML status code, which basically means "forbidden". If it returns 403, this means that the website has denied access, because of some reason. On the other hand, 200 is another HTML status code, which means "Request successful". The code aboce sucessfully returns 200, which means that access permission was granted. If this is okay, then the next step is extracting the desired information using html tags. By importing a package called the BeautifulSoup into the python file, I was able to retrieve the html code of the website with the following code:
-```
+```py
 allRecipes_soup = BeautifulSoup(allRecipes.content, "html.parser")
 containers1 = allRecipes_soup.findAll("article", {"class": "fixed-recipe-card"})
 ```
@@ -78,7 +78,13 @@ containers1 = allRecipes_soup.findAll("article", {"class": "fixed-recipe-card"})
  
 Because the findAll command can hekp us find all of the referring tags, the code itself was very simple. Although because in this app, I wanted to have many menus available for the users, I chose not only to inspect the first page of the website but for multiple pages. Each page in the www.allrecipes.com contained twenty different menus, thus I ran a for loop for multiple pages, to retrieve as many manu informations as possible. The following is the code:
 
-```
+```py
+filename1 = "recipes.csv"
+f1 = open(filename1, "w")
+
+headers1 = "menu_name, menu_description, recipe_link \n"
+f1.write(headers1)
+
 # retrieve data from www.allrecipes.com (source 1)
 pageNum = 2
 # # list for all the names, descriptions and links
@@ -106,6 +112,9 @@ for page in range(pageNum, n):
         recipe_link = link_container["href"]
         # adding links into the list
         link_list.append(recipe_link)
+        print(f"name: {menu_name} \n description: {menu_desc} \n link: {recipe_link}")
+        # adding data into csv file
+        f1.write(menu_name.replace(",", " ") + "," + menu_desc.replace(",", "/") + "," + recipe_link + "\n")
 ```
 The range of the for loop `(pageNum, n)`, where n can be any number bigger than 2. If I print the results on the console it would be something like this: 
 ```
@@ -122,7 +131,29 @@ name: Baked Salmon Fillets Dijon
  description: Delicious baked salmon coated with Dijon-style mustard and seasoned bread crumbs, and topped with butter. 
  link: https://www.allrecipes.com/recipe/22538/baked-salmon-fillets-dijon/
 ```
-This is just part of the output. Although essentially this would continue until the for loop has looped over every page.
+This is just part of the output. Although essentially this would continue until the for loop has looped over every page. Then after all of this is done, these extracted data needs to be stored inside a csv file, so that it can access this information anytime when the software is activated. The relevant codes for this process is the following part:
+```py
+filename1 = "recipes.csv"
+# open file recipes.csv
+f1 = open(filename1, "w")
+# Create titles of the rows
+headers1 = "menu_name, menu_description, recipe_link \n"
+f1.write(headers1)
+
+for page in range(pageNum, 3):
+    # extracting html code
+    for container in containers1:
+        # find tags for desired data
+        f1.write(menu_name.replace(",", " ") + "," + menu_desc.replace(",", "/") + "," + recipe_link + "\n")
+        
+f1.close()
+```
+This is the code snipet of the part where it copies extracted information inside a csv file. All of the information that were extracted from the webpages are now accessible in one page. 
+
+This is the basic procedure of creating a csv file, and in the actual software, I used several different websites, and within those different websites, multiple pages, to diversify the data, and to have many options kept for the users. 
+
+### Accessing and reading data from the csv file
+
 
 
 
