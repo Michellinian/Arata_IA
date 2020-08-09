@@ -45,7 +45,146 @@ This is the very first sketch of the app. It has the login page, registration pa
 ## Secure Login System 
 
  In this app, the users will need to be able to log into there own page. One of the function of this app is that it should remember what the user searched before. Therefore there needs to be a page that is dedicated only to the user themselves. This is why the app needs a secure login system; to make sure that other users don't mess with other people's accounts.
- One of the requirements for the secure login system is that it is very clear for the user. There are few boxes for the users to type in their personal information, and these boxes should indicate very clearly which information should be entered where. This is what the login and sign up page look like: 
+ One of the requirements for the secure login system is that it is very clear for the user. There are few boxes for the users to type in their personal information, and these boxes should indicate very clearly which information should be entered where. For example this is what the sign up window looks like:
+![signuppage](Appendix/signupPage.png)
+
+
+In this program what is different is that I actually divided the functions back into small bits. What I wanted to do was that I wanted to check if all the functions return True or not, and if does then it should open the main page. This is why I seperated all the functions so that it can either return true or nothing for each one. This enabled me to say that if all the test passes, then it can open the main page. This code works completely fine, although I thought that it was hard to read. I tried to repeat the same thing again and again, for example the line `variableName = self.lineEdit_n.text()`. I couldn't figure out how to create a variable in a class that can be used in method within the class, and I did manage to do this by setting a parameter in each function, that has the same name as the variable. Although, this made things rather complicated, and the code is now very hard to read, and unorganized. Thus I decided to reorganize the code again, with the same function but easier to understand and check. Also I added a new method called storeSecureInfo and this allows the user information to be encrypted and stored. The mechanism will be explained below. This is the new and final code:
+```py
+    def openlogin(self):
+        login = loginWindow(self)
+        login.show()
+
+    def checkUsername(self):
+        username = self.username.text()
+        if username.isalpha() or username != "":
+            self.username.setStyleSheet("border: 2px solid blue")
+            return True
+        self.username.setStyleSheet("border: 2px solid red")
+        return False
+
+    def checkEmail(self):
+        email = self.email.text()
+        if "@" not in email or email.isdigit() or email == "":
+            self.email.setStyleSheet("border: 2px solid red")
+            return False
+        self.email.setStyleSheet("border: 2px solid blue")
+        return True
+
+    def checkPassword(self):
+        password = self.password1.text()
+        if password.isalpha() or password.isdigit() or len(password)<6 or password == "":
+            self.password1.setStyleSheet("border: 2px solid red")
+            return False
+        self.password1.setStyleSheet("border: 2px solid blue")
+        return True
+
+    def checkConfirmedPassword(self):
+        password = self.password1.text()
+        confirmedPassword = self.password2.text()
+        if password == confirmedPassword and password != "" and confirmedPassword != "":
+            self.password1.setStyleSheet("border: 2px solid blue")
+            self.password2.setStyleSheet("border: 2px solid blue")
+            return True
+        self.password1.setStyleSheet("border: 2px solid red")
+        self.password2.setStyleSheet("border: 2px solid red")
+        return False
+
+    def checkRegistration(self):
+        self.checkUsername()
+        self.checkEmail()
+        self.checkPassword()
+        self.checkConfirmedPassword()
+        if self.checkUsername() is True and self.checkEmail() is True:
+            if self.checkPassword() is True:
+                if self.checkConfirmedPassword() is True:
+                    self.openMain()
+                    self.storeSecureInfo()
+
+    def openMain(self):
+        main = mainWindow(self)
+        main.show()
+
+    def storeSecureInfo(self):
+        email = self.email.text()
+        password = self.password1.text()
+        hashedInfo = myLib.hashPassword(username + password)
+        with open('output.txt','a') as outputFile:
+            outputFile.write(f"{hashedInfo}\n")
+        self.close()
+```
+First of all what I did in this code is that, I changed the names of the methods, because in the previous code, I focused too much on how to shorten the method names, that it became hard to understand which method does what. Therefore in this new code, I changed the name to something that is a little bit longer, but more explicit. In this way we can tell what method does what immediately. Second, I replaced the variables of the texts. I decided to repeat the variable each time in different methods, because I thought that this is the most simple way, and it is easy to understand. Also for the step that checks if all the methods retur true or not, I put that into a whole new method called checkRegistration whereas initially I had it in the openMain method. This too, is for th reason of making it as simple as possible. I wanted the openMain method to only be dedicated on that one move and nothing else, because it makes things much more easier. Finally for the new method, it's functionality is that, it takes the username as well as the password and it encrypts them and store it in a txt file called output.txt. This becomes very important when the user wants to log into their own account, because the username and the password will be securely stored in the program. In the method it says `hashedInfo = myLib.hashPassword(username + password)`, and this function hashPassword does the encrypting part. This explanation is in the section "Secure Login System".
+
+
+### Login in 
+
+In the login page, what the user needs to be able to do is to type in their username and password, and if they entered the correct information, then they should be able to go inside the main page. The username and the password should come from the information they entered in the sign up page. Only if the typed in information in the login page, matches with the information that the user typed in for registration previously, then they should be able to access their inventory. 
+```py
+class loginWindow(login):
+    def __init__(self, parent=None):
+        super(loginWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.username.setPlaceholderText("enter username")
+        self.password.setPlaceholderText("enter password")
+
+        # pushButton = signupButton
+        self.pushButton.clicked.connect(self.opensignup)
+        # password -> black dot
+        # self.password.setEchoMode(QLineEdit.Password)
+        self.loginButt.clicked.connect(self.checkLoginInfo)
+
+    def openMain(self):
+        main = mainWindow(self)
+        main.show()
+
+    def opensignup(self):
+        signup = signupWindow(self)
+        signup.show()
+
+    def checkLoginInfo(self):
+        email = self.email.text()
+        password = self.password.text()
+        outputFile = open('output.txt', 'r')
+        count = 0
+        for line in outputFile:
+            count += 1
+            if myLib.verifyPassword(line, email + password) is True:
+                self.email.setStyleSheet('border: 2px solid blue')
+                self.password.setStyleSheet('border: 2px solid blue')
+                # self.close()
+                self.openMain()
+                break
+            else:
+                self.email.setStyleSheet('border: 2px solid red')
+                self.password.setStyleSheet('border: 2px solid red')
+```
+This is the full code for the login page. In this class there are three methods. There is the openMain and openSignup method, which simply opens the main page and the signup page. The third method is called the checkLoginInfo, and this method is the most important one. In this method, it takes the username and password typed in by the user, and basically what it does is that it compares the encrypted version of those two values with the stored value in output.txt. This stored value is the encrypted username and password that was typed in the sign up page. This is where the storeSecureInfo in the signUpWindow class and this method link together. When receiving the stored value from output.txt, it is programmed so that it reads one line each, so that multiple users can use the app. The received information is now compared to the new hashed information. These processes are all done in the verifyPassword function located in myLib, and there will be a brief explanation about this later on. If this function returns true, meaning if the two values, the stored and the provided information, are matching then it opens the main page, and simultaneously close the login page. Otherwise, it would indicate an error by changing the color of thw text box.
+
+
+### Secure Login System 
+This secure login system is to increase the security for the user so that their personal data will not be stolen or seen without permission. There are two main functions that shape up this system:
+```py
+import hashlib, binascii, os
+
+def hashPassword(password):
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
+    pwdhash = binascii.hexlify(pwdhash)
+    return (salt + pwdhash).decode('ascii')
+
+def verifyPassword(storedPassword, providedPassword):
+    salt = storedPassword[:64]
+    storedPassword = storedPassword[64:-1]
+    print(storedPassword)
+    pwdhash = hashlib.pbkdf2_hmac('sha512', providedPassword.encode('utf-8'), salt.encode('ascii'), 100000)
+    pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+    print(pwdhash)
+    return pwdhash == storedPassword
+```
+In the hashPassword function, first of all it creates something called the salt. In the line `salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')`, the default size of a hash is 64 bytes, and they are converted into worth 64 bytes of ascii characters. Basically salt is a set of information that randomly generated, just to make the password harder to decode. Then in `hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)`, it hashes the encoded password using the salt that has been generated, and that information is made to 64 bytes, and that process will be repeated 100000 times, so that it would become more random. Then after that it is encoded 2 bytes hexadecimal string. Thus the return value is the value of the hashed password but with the salt in front of it. This function was called in the signupWindow class' storeSecureInfo method. In this case the parameter was the password that the user typed in to the password text box. And this new value generated through the hashPassword function is stored into a text file so that it can be retrieved and compared in the later process. 
+
+In the verifyPassword function, it almost does the same thing. The password provided by the user in the login page, is taken as the parameter providedPassword, and this is hashed using the exact same process in the previous function. What is different in this function is that this function is to compare the two values: the stored value that was created with the hashPassword, and the hashed provided password. What it does to compare these two values, is first it retrieves the stored password (the function itself doesn't but in the checkLoginInfo method it does), and it checks for the salt. The salt is the first 64 digits, so it neglects all of that and takes the rest of the value which is supposedly the hashed password. If this matches the newly hashed password, then the user will be able to go in their page. This function returns a boolean, and if it is true, then it will go to the main page.
+ 
  
 
 ## Creating a database
