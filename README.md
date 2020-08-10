@@ -40,7 +40,7 @@ This is the very first sketch of the app. It has the login page, registration pa
 ### Update of the sketch 
 
 ### System Diagram of the software 
-![systemDiagram](Appendix/systemDiagram.png)
+![systemDiagram](appendix/systemDiagram.png)
 This is the system diagram of this software. There are basically four main pages: Registration (or the singup) page, login page, the main page, and the results page. The default of this software is the login page, since every user needs to have a secure account. Registration page is only for usersnew to software and haven't created an account before. Then there is the main page, which takes user inputs in two different ways. First is text style. As you can see in the app sketch above, the main page has a searchbox, where the users can type in keywords, and the app will return whatever menu that associates with that keyword. Another input is the buttons. If the users tap or click on these buttons, the app will again, automatically show associated menus with the label of the buttons.
 
 
@@ -50,7 +50,7 @@ This is the system diagram of this software. There are basically four main pages
 
  In this app, the users will need to be able to log into there own page. One of the function of this app is that it should remember what the user searched before. Therefore there needs to be a page that is dedicated only to the user themselves. This is why the app needs a secure login system; to make sure that other users don't mess with other people's accounts.
  One of the requirements for the secure login system is that it is very clear for the user. There are few boxes for the users to type in their personal information, and these boxes should indicate very clearly which information should be entered where. For example this is what the sign up window looks like:
-![signuppage](Appendix/signupPage.png)
+![signuppage](appendix/signupPage.png)
 
 
 In this program what is different is that I actually divided the functions back into small bits. What I wanted to do was that I wanted to check if all the functions return True or not, and if does then it should open the main page. This is why I seperated all the functions so that it can either return true or nothing for each one. This enabled me to say that if all the test passes, then it can open the main page. This code works completely fine, although I thought that it was hard to read. I tried to repeat the same thing again and again, for example the line `variableName = self.lineEdit_n.text()`. I couldn't figure out how to create a variable in a class that can be used in method within the class, and I did manage to do this by setting a parameter in each function, that has the same name as the variable. Although, this made things rather complicated, and the code is now very hard to read, and unorganized. Thus I decided to reorganize the code again, with the same function but easier to understand and check. Also I added a new method called storeSecureInfo and this allows the user information to be encrypted and stored. The mechanism will be explained below. This is the new and final code:
