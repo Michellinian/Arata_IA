@@ -42,6 +42,8 @@ This is the sketch of the app. It has the login page, registration page, home pa
 This is the system diagram of this software. There are basically four main pages as mentioned above. The default of this software is the login page, since every user needs to have a secure account. Registration page is only for users new to the software and haven't created an account before. Then there is the main page, which takes user inputs in two different ways. First is text style. As you can see in the app sketch above, the main page has a searchbox, where the users can type in keywords, and the app will return whatever menu that associates with that keyword. Another input is the buttons. If the users tap or click on these buttons, the app will again, automatically show associated menus with the label of the buttons. The results page is opened, when search button is pressed, and the data has been gathered. It should show the users multiple menus of what they might be looking for. Furthermore users should be able to see more descriptions about the menu once they click the buttons on the results page. This is the basic flow of the entire system.
 
 ### Flow charts of the software
+![flowChart1](appendix/flowChart1.png)
+
 
 
 
