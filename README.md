@@ -9,25 +9,26 @@ Repo for the IA
 
 # Planning 
 
-### Defining the Problem 
-My client is my mother, and she is currently facing a problem of having to think of what to cook for every meal; breakfast, lunch and dinner, for her family everyday. Especially in the current situation of covid-19 pandemic, everyone in her family members now stay in their house for the whole day, therefore she needs to cook three meals every day, for the whole family member. My client is in need for something that can help her with coming up with different menus for every meal. She doesn't want to cook the same thing everyday, although she is having trouble coming up with non-repetitive menus. Furthermore, she also wants her family to eat healthily, with balanced nutrition, and she needs a way to find out this information quickly and easily as she is not a big fan of conducting research on the internet. To sum up, my client is in need of a simple way to come up with different but healthy menus for every meal, every day, without having to experience any stress.
+### Defining and Consulting the Problem 
+
+My clients are my mother and my aunt, and they are currently facing a problem of having to think of what to cook for every meal; breakfast, lunch and dinner, for their family everyday. Especially in the current situation of covid-19 pandemic, everyone in their family members now stay in their houses for the whole day, therefore they need to cook three meals every day, for their whole family members. My clients are in need for something that can help them with coming up with different menus for every meal. They don't want to cook the same thing everyday, although they are having trouble coming up with non-repetitive menus. Furthermore, they also want their family to eat healthily, with balanced nutrition, thus they need a way to find out this information quickly and easily as they are not a big fan of conducting research on the internet. To sum up, my clients are in need of a way to come up with different but healthy menus for every meal, every day, without having to experience the same difficulties they face everyday. 
 
 ### Solution Proposed
-The solution for this is to create a mobile application that fulfills her needs. The software should allow my client to live a stress free life, by providing a simple enough way to search for varieties of recipes, along with the ingredients and nutrition data. The input that it will take are the keywords users typed in. The users will also have the option to select the genre of the menu, in case if they cannot come up with any keywords. The application should then output the menus corresponding to the keyword to suggest the possible menus. More specifically it should show the rmenu names, images, description, ingredients, recipe and the nutrition facts so that the user can see all the necessary information in one glance. Furthermore it should also be able to prevent the users from cooking the same meal, therefore it has to acquire a system where, if the user chooses the same menu consecutively, it should notify them that they are doing so. My client only uses her iphone, therefore the shape will of the software will be delivered as a mobile application. Furthermore python will be used as the programming language because it has simple syntax compared to other programming languages. This also makes it easier to debug, and this is worth considering because the program cannot be done in several lines. 
+
+The solution for this is to create a software that provides a way for my clients to look for varieties of menus, along with the ingredients, recipe and nutrition data. This should be done in two simple steps: one, type in a keyword (i.e. chicken, tomato, etc.), two, look for and tap on the menu you want to cook. These are the only steps the users need to follow. As of application, what it should do is after a keyword has been typed in, it should return the search result of multiple possible menus, corresponding to the keyword. After the users have tapped on the menu they want, it should present the ingredients, recipe and nutrition data in one glance. Furthermore it should also be able to alert the users from cooking the same meal. Therefore, it has to acquire a system which tells the users that the menu has been used recently. This software will be in the form of a mobile application, because both of my clients most frequently use their iphone. Thus Swift was used as the most suitable programming language, since this project requires developing an iOS application, and there are no other programming languages that can do this better than Swift.
+
 
 ### Success Criteria 
 
 1. User can create their own account
-2. User can login to their own account 
+2. a) User can login to their account
+   b) User can also logout of their account
 3. Keywords can be inputted into the text box in the main page
 4. The main page also shows different buttons with the names of different food genre ("Japanese", "Korean", etc.)
 5. The search results shows the name of the recipe along an image and a brief description
-6. The search results should show multiple menus 
+6. The search results should show multiple food menus 
 7. When clicking on the recipe from the search results, information about ingredients and nutrition is presented 
-8. User can go back and forth a page
-9. The user can logout 
-10. When same menu has been selected from the search results within 24 hours a message should popup in the center of the page saying "This menu has been selected recently. Do you still want to keep going?"
-11. Along with the message in no.9 it should also show a clickable yes or no option below - if yes is selected it should move on to the description page, if no is selected it should stay on the results page
+8. When same menu has been selected from the search results within 24 hours (because the client wants to cook new recipe everyday) a message should pop up in the center of the page saying "This menu has been selected recently. Do you still want to keep going?"
 
 
 # Design 
@@ -48,6 +49,258 @@ This is the system diagram of this software. There are basically four main pages
 
 
 # Development 
+
+## Techniques Used
+
+ 1. Firebase authentication system for registering account and logging in 
+ 2. Webscraping to create the database for the recipes
+ 
+## Registration / Login System
+
+ In this app, the users should be able to create their own account. One of the functions of this app is that it should remember what the user searched before. Therefore there needs to be a page that is dedicated only to the user themselves. As it only is for my mother and my aunt, the registration/login system does not have to be as secure as for example the Amazon's system, but it still has to be able to securely store users' information into a database.
+ This system consists of two pages, the registration page, and the login page. The users will first go to the registration page, and they create their own account by entering their account information. Then this information is stored in something called the Firebase, so whenever the registered user logs in to their own account, the application accesses the Firebase with the stored information, to check if the login information and the registered information match. 
+
+### Firebase 
+
+Firebase is a platform that developed by Google, and it "lets you build more powerful, secure and scalable apps, using world-class infrastructure" (Firebase). This is a real-time database, and this Firebase is used in the applications's user authentication system. In this particular registration system, it is used as a database, and to be more specific, a database for users' information. 
+
+## Registration
+
+ For the registration the user would need to type in four different information: username, email address, password, and confirmed password. Since this is a login system for two people, there are only a few restriction to the format of information. All of this check list for the validation of information is within the comments in the codes below.
+ ```swift
+ struct SignupView: View {
+ 
+     // Create variable for error message 
+     @State var errorMessage = ""
+     
+     func validateFields() -> String? {
+        
+        // check if all the fields are filled
+        if self.username_su.count == 0 || self.email_su.count == 0 || self.password_su.count == 0 || self.confirmPassword.count == 0 {
+            
+            errorMessage = "Please fill in all fields"
+            return "error"
+
+        }
+        // check if the password is secure
+        if self.password_su.count < 8 {
+            
+            errorMessage = "Please make sure your password is at least 8 characters."
+            return "error"
+            
+        }
+        // check if the password and confirmed password match
+        if self.confirmPassword != self.password_su {
+            
+            errorMessage = "Please make sure that your passwords match."
+            return "error"
+            
+        }
+        
+        return nil
+        
+    }
+}  
+```
+ This is a function called "validateFields" and this is ran when the user taps the "Create Account" button. This function checks for existing errors, and depending on the errors that it detects, it shows different error messages. These error message are stored in a variable called errorMessage, which is declared above the function. This makes the variable usable throughout the entire `struct SignupView`. As shown in the code, errorMessage will acquire different messages when detecting different errors. 
+ The variable `errorMessage` is then passed on further in the code as the following:
+ 
+ ```swift 
+ struct SignupView: View {
+ 
+      // initializing the authenticationSucceed_su variable to false 
+      @State var authenticationSucceed_su = false
+ 
+      // ViewBuilder
+      var body: some View {
+        NavigationView {
+            VStack {  
+            
+                // if authenticationSucceed_su is true, then set the message to "Success"
+                if authenticationSucceed_su {
+                    Text("Success!")
+                        .background(Color.white.opacity(0.6))
+                        .cornerRadius(8)
+                        .foregroundColor(.black)
+                        .padding(.top, 30)
+                }
+                else {
+                    // if not then show different error messages for different errors
+                    Text(errorMessage)
+                        .background(Color.white.opacity(0.6))
+                        .cornerRadius(8)
+                        .foregroundColor(.red)
+                        .padding(.top, 30)
+                }
+
+ ```
+ 
+ This code was taken from a tutorial video ("Firebase Authentication Tutorial 2020 - Custom iOS Login Page (Swift)"), and modified. The reason why, it shows `errorMessage` as the text, instead of a designated string if authenticationSucceed_su is not true, is because we want different error messages for different errors, so that the users know exactly what is wrong with their information. Now that the cases for which authenticationSucceed_su is true or false are declared, there needs to be a conditional statement saying that if all the information the user typed in are valid, authenticationSucceed_su should be equal to true.
+ ```swift
+Button(action: {
+
+     // create constant "error" which contains the returned value from running validateFields()
+     let error = validateFields()
+                    
+     if error != nil {
+                        
+          // If error in fields show error message
+          self.authenticationSucceed_su = false
+                        
+     } else {
+                        
+          // show message to show that sign up was successful
+          self.authenticationSucceed_su = true
+          
+          // storing user info in db file 
+          // transition to homescreen
+     }
+ }
+ 
+ ```
+ This is the code that does this. The comments explicitly show which line does which operation, although to clarify, it is basically receiving  the return result from the `func validateFields()`, storing that in a constant, and putting that constant against conditional statements to see if that constant equals error or nil. Then depending on the different return results, `authenticationSucceed_su ` will return true or false. 
+ 
+## Storing user data into database
+
+Using firebase's cloud firestore, a collection called users is created, and all the user information are stored in this database when the "Create account" button is tapped. Thus this should happen at the same time as the validation process. From the `Button(action:{})` function above, it can be seen that the code for the process of storing the user information into the database is also located in the same place. 
+
+```swift
+// Create the user
+Auth.auth().createUser(withEmail: email, password: password) { (result, err) in
+     // Check for errors
+     if err != nil {
+                 
+          // There was an error creating the user
+          print("Error creating user")
+                      
+      } else {
+                                
+           // User was created successfully, now store the username
+           let db = Firestore.firestore()
+                              
+           // Adding the user information into their user id that is created in the Firebase cloud store        
+           db.collection("users").addDocument(data: ["username":username,  "uid":result!.user.uid]) { (error) in
+                                    
+                if error != nil {
+                     print("Error saving user data")
+                }
+       }
+}
+```
+This code directly adds the user information in the database in Firebase, and this information will be used in the login process, which will be explained in the next section.
+
+## Login 
+
+For the login the algorithm of the system is very simple: read the email and password that the user typed in the login page, then access the Cloud Firestore and see if there is a match in the entered information and the registered information. If there is a match, it should make a transition to the homescreen, and if not error message should be shown.
+```swift 
+struct LoginView: View {
+     @State var authenticationSucceed_li = false
+     
+     func verifyLogin(email: String, password: String) -> Bool {
+          
+          // Checking the firebase if the entered login information matches the registered
+          Auth.auth().signIn(withEmail: email, password: password) {(result, error) in
+
+               if error != nil {
+                    // Couldn't sign in
+                    errorMessage = "Wrong email address or password. Please try again."
+                    self.authenticationSucceed_li = false
+               } else {
+                    self.authenticationSucceed_li = true
+               }
+           }
+           
+           // assigning a number for true and false so the later on it can be said that ex. verifyLogin == 1
+           if self.authenticationSucceed_li == true {
+                return true
+           } else {
+                return false
+           }
+     }
+}
+```
+The variable authenticationSuccedd_li has the exact same function as authenticationSucceed_su from the SignupView, thus explanation of this will be abridged. What this function does is, that it returns true if authenticationSucceed is equal to true and if not, it would return false. This function was intentionally created to return a boolean, so that afterwards, it can be ran in conditional statements, saying that if verifyLogin is equal to true, then open home view, and so on. 
+
+
+
+
+ 
+```swift
+Button(action: {
+                    
+     // create constant "error" which contains the returned value from running validateFields()
+     let error = validateFields()
+                    
+     if error != nil {
+                        
+          // If error in fields show error message
+          self.authenticationSucceed_su = false
+                        
+      } else {
+                        
+           // show message to show that sign up was successful
+           self.authenticationSucceed_su = true
+                        
+           // Create cleaned versions of the data
+           let username = self.username_su
+           let email = self.email_su
+           let password = self.password_su
+           let confirmPassword = self.confirmPassword
+                        
+            // Create the user
+            Auth.auth().createUser(withEmail: email, password: password) { (result, err) in
+                 // Check for errors
+                 if err != nil {
+                 
+                      // There was an error creating the user
+                      print("Error creating user")
+                      
+                 } else {
+                                
+                      // User was created successfully, now store the username
+                      let db = Firestore.firestore()
+                              
+                      // Adding the user information into their user id that is created in the Firebase cloud store        
+                      db.collection("users").addDocument(data: ["username":username,  "uid":result!.user.uid]) { (error) in
+                                    
+                           if error != nil {
+                                print("Error saving user data")
+                           }
+                       }
+                                
+                    // Transition to the home screen
+                    
+               }
+          }
+     }
+
+}) {
+     // Set text of button to "Create account"
+     Text("Create Account")
+          .foregroundColor(.white)
+          .font(.system(size: 24, weight: .medium))
+
+}
+               
+```
+This is the function of the "Create Account" button. Everything inside `Button(action:{})` will be executed when the button is tapped. The operations are explained in the comments in the code sample above. This code was also modified from the original code supplied by the same source. The code that ultimately decides which message to show, is this bit: 
+
+```swift
+if error != nil {
+                        
+     // If error in fields show error message
+     self.authenticationSucceed_su = false
+                        
+} else {
+                        
+     // show message to show that sign up was successful
+     self.authenticationSucceed_su = true
+     
+     // the remaining of the code 
+}
+```
+This conditional statement is the key to showing which message to user, in which condition. If the user entered invalid information then, it should not go back to 
+
 
 ## Secure Login System 
 
